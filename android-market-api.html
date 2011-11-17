@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="zh-cn" xml:lang="zh-cn">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-language" content="zh-cn" />
+<meta name="Generator" content="Vim 7.2 (Vi IMproved editor http://www.vim.org/)" />
+<title>Andriod Market API</title>
+<style type="text/css">
+h2 { }
+h3 { background-color:#E6ECF9; border-top:1px solid #3366CC; font-size:medium; font-weight:bold; padding:1px 6px 1px 1em; }
+h4 { border-bottom:1px dashed #BEBEBE; margin:1.5em 0 0.7em 1.5em; overflow:hidden; padding-right:0; }
+a { text-decoration:none; }
+a:visited { text-decoration:none; }
+a:link { text-decoration:none; }
+a:hover { background:none repeat scroll 0 0 #DDDDDD; color:#FF0000; text-decoration:underline; }
+
+p { text-indent: 2em; }
+code, pre  { color:#007000; font-family:monospace; line-height:1em; }
+pre { background-color:#FAFAFA; border:1px solid #CCCCCC; line-height:inherit; margin:0 0 1em 1em; overflow:auto; padding:10px; } 
+ol, ul { line-height:125%; margin:0.5em 0 0 15px; }
+
+.muse-table { width: auto; margin-right: 5%; margin-left: 5%; margin-top: 0.5em; margin-bottom: 0.5em; clear: right; line-height:125%; border-spacing: 0 !important; border-right: 1px solid rgb(51,102,204) !important; border-bottom:1px solid rgb(51,102,204) !important; border-left: none;  border-top: none; }    
+
+.muse-table th { width: auto; margin: 0; padding: 6px 12px 6px 12px; text-align: left; font-weight: bold; background-color: rgb(229, 236, 249); font-size: small; border-top: 1px solid rgb(51,102,204) !important; border-left: 1px solid rgb(51,102,204) !important; border-collapse: collapse; }
+.muse-table td { margin: 0; width: auto; padding: 6px 12px 6px 12px; text-align: left; font-size: small; border-top: 1px solid rgb(51,102,204) !important; border-left: 1px solid rgb(51,102,204) !important; border-collapse: collapse; }
+hr { border-color:#3366CC -moz-use-text-color -moz-use-text-color; border-style:solid none none; border-width:1px medium medium; color:#3366CC; height:0; margin-bottom:2px; margin-top:0; padding:0; }
+span.footerdate { color:#666666; font-size:small;font-weight:bold; }
+
+
+</style>
+</head>
+
+<body>
+<h2 style="text-align: center"> Andriod Market API</h2>
+
+<h3>Android Market 概览:客户端与服务器</h3>
+<p> <img src="image/android-market-technology1.png" alt="android market technology " /> </p>
+<hr />
+
+<p> <img src="image/android-market-technology2.png" alt="android market technology " /> </p>
+
+<h3> AuthToken的获取</h3>
+<p> Login URL : <a href="https://www.google.com/accounts/ClientLogin">https://www.google.com/accounts/ClientLogin </a></p>
+<p> 参数 : </p>
+<table class="muse-table" cellpadding="0">
+	<thead>
+		<tr>
+			<th>参数</th>
+			<th>值</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td> Email </td>
+			<td> Google 帐号 </td>
+		</tr>
+		<tr>
+			<td> Passwd </td>
+			<td> Google 帐号密码 </td>
+		</tr>
+		<tr>
+			<td> service </td>
+			<td> "android" </td>
+		</tr>
+		<tr>
+			<td> accountType </td>
+			<td> "HOSTED_OR_GOOGLE" </td>
+		</tr>
+
+	</tbody>
+</table>
+
+<p>请求后返回的响应字符串中找 Auth:xxxxxxxxxx </p>
+
+
+<h3>下载一个软件</h3>
+<p>URL: http://android.clients.google.com/market/download/Download</p>
+<p>需要两个参数:</p>
+<table class="muse-table" cellpadding="0">
+	<thead>
+		<tr>
+			<th>参数</th>
+			<th>值</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td> userId </td>
+			<td> 与Google帐号相关的值，用tcpdump抓数据包，然后用wireshark分析。也可以从DownloadProvider 数据库中找到</td>
+		</tr>
+		<tr>
+			<td> deviceId </td>
+			<td> 手机设备号，也可以用SDK默认的"000000000000000"</td>
+		</tr>
+	</tbody>
+</table>
+<p> 设置cookie, User-agent： </p>
+<pre><code>
+Cookie:"ANDROID=" + authToken
+User-agent:AndroidDownloadManager
+</code></pre>
+
+
+
+<h3>searching an apk</h3>
+
+<pre><code>
+
+POST /market/api/ApiRequest HTTP/1.1
+Host: android.clients.google.com
+Connection: Keep-Alive
+Content-Length: 476
+user-agent: Android-Market/2 (dream CRC1); gzip
+content-type: application/x-www-form-urlencoded
+
+version=2&amp;request=CsUCCuABRFF….ETXl5Qi1wUDcy
+</code></pre>
+
+
+<p>request 后面的字符串，是参数protbuf序列化，再经过base64加密。<br />
+请求的Context参数如下:</p>
+<table class="muse-table" cellpadding="0">
+	<thead>
+		<tr>
+			<th>参数</th>
+			<th>值</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td> authSubToken</td>
+			<td> authsub token for service 'android'</td>
+		</tr>
+		<tr>
+			<td> unknown1 </td>
+			<td> always 0 </td>
+		</tr>
+		<tr>
+			<td> version </td>
+			<td> always 1002</td>
+		</tr>
+		<tr>
+			<td> deviceId </td>
+			<td>android id converted to hexadecimal //可以用默认的"0000000000000000" </td>
+		</tr>
+		<tr>
+			<td> deviceAndSdkVersion </td>
+			<td> ro.product.device ':' ro.build.version.sdk //"sapphire:8" </td>
+		</tr>
+		<tr>
+			<td> userLanguage </td>
+			<td> ro.product.locale.language //"zh" </td>
+		</tr>
+		<tr>
+			<td> userCountry </td>
+			<td> ro.product.locale.region //"cn" </td>
+		</tr>
+		<tr>
+			<td> operatorAlpha </td>
+			<td>gsm.operator.alpha //"T-Mobile USA" </td>
+		</tr>
+		<tr>
+			<td> simOperatorAlpha </td>
+			<td>gsm.sim.operator.alpha  //"T-Mobile USA" </td>
+		</tr>
+		<tr>
+			<td> operatorNumeric </td>
+			<td> gsm.operator.numeric //"310260" </td>
+		</tr>
+		<tr>
+			<td> simOperatorNumeric </td>
+			<td> sim.gsm.operator.numeric //"310260" </td>
+		</tr>
+	</tbody>
+</table>
+
+<p>
+发送请求后，得到的响应数据是经过gzip压缩过的。
+</p>
+
+<hr />
+<p>参考:</p> 
+<ul>
+	<li> Android market api 
+	<a href="http://code.google.com/p/android-market-api/">http://code.google.com/p/android-market-api/</a> </li>
+	<li> Ruby bindings for the android market api 
+	<a href="http://github.com/jberkel/supermarket">http://github.com/jberkel/supermarket</a> </li>
+	<li>Downloading market applications without the vending app 
+	<a href="http://strazzere.com/blog/?p=293">http://strazzere.com/blog/?p=293</a></li>
+	<li>Android application widget <a href="http://wordpress.org/extend/plugins/android-application-widget/">http://wordpress.org/extend/plugins/android-application-widget/</a></li>
+</ul>
+<p> <span class="footerdate">Last Modified: <i>October 25, 2010</i> By Lytsing Huang</span></p>
+
+</body>
+</html>
+

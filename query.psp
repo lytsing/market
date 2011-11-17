@@ -1,0 +1,116 @@
+<%@ include file="header.psp" %>
+
+<%
+import MySQLdb
+import cgi
+
+kandroid_market = apache.import_module("kandroid_market", path=['/home/deli/market'])
+market_pb2 = apache.import_module("market_pb2", path=['/home/deli/market'])
+
+cgival_query = ""
+cgival_pageIdx = 1
+
+queryEntriesCount = 0
+
+if req.parsed_uri[apache.URI_QUERY]:
+	pairs = cgi.parse_qs(req.parsed_uri[apache.URI_QUERY])
+	for key, value in pairs.items():
+		if key == 'query':
+			cgival_query = value[0]
+		elif key == 'pageIdx':
+			cgival_pageIdx = int(value[0])
+
+%>
+
+<%
+if cgival_pageIdx > 80:
+	req.write("谷歌Android市场目前提供的列表没有超过800多个。")
+
+elif cgival_query:
+	request = kandroid_market.Request(req)
+	request.appRequest(cgival_query, cgival_pageIdx)
+	data = request.executeHttpQuery()
+	response = market_pb2.Response()
+	response.ParseFromString(data)
+
+	for rGroup in response.responsegroup:
+		queryEntriesCount = rGroup.appsResponse.entriesCount
+%>
+	<div class="resultHeader"><strong><%=rGroup.appsResponse.entriesCount%></strong>&nbsp;项符合“<strong><%=cgival_query%></strong>“的搜索结果：</div>
+<%
+		for rApp in rGroup.appsResponse.app:
+%>
+	<table class="assetItem"><tr>
+	<td class="icon">
+<%
+			req.write("<img width='48' src='/market/icon.psp?appId=%s' alt='' />" % (rApp.id))
+%>
+	</td>
+	<td class="title">
+	<strong><a href="/market/asset.psp?appId=<%=rApp.id%>"><%=rApp.title.encode("utf-8")%></a></strong><br />
+	<%=rApp.creator.encode("utf-8")%>
+	</td>
+	<td class="price">
+<%
+			if rApp.price:
+				req.write(rApp.price.encode("utf-8"))
+			else:
+				req.write("免费")
+			req.write("<br /><img src='/market/image/star_%s.png' alt='rating' />" % rApp.rating[0:3]);
+%>
+	</td>
+	</tr>
+	<tr><td style="height:1px" colspan="3" class="list_hr_line"></td></tr>
+	</table>
+
+<%
+	totalPageIdx = queryEntriesCount / 10 + 1
+	_totalPageIdx = totalPageIdx
+
+	if totalPageIdx > 80:
+		totalPageIdx = 80
+
+	startPageIdx = ((cgival_pageIdx -1) / 10) * 10 + 1
+	if totalPageIdx > startPageIdx + 9:
+		endPageIdx = startPageIdx + 9 
+	else:
+		endPageIdx = totalPageIdx
+
+	req.write("<div class='yt-uix-pager'>")
+	if startPageIdx > 1:
+		req.write("<button href='/market/query.psp?query=%s&amp;pageIdx=1' class='yt-uix-button' type='button' onclick=\";window.location.href=this.getAttribute('href');return false;\">" % cgival_query)
+		req.write("<span class='yt-uix-button-content'>1</span>")
+		req.write("</button>")
+		req.write("...")
+		req.write("<a href='/market/query.psp?query=%s&amp;pageIdx=%d' class='yt-uix-pager-link'>" % (cgival_query, startPageIdx - 1))
+		req.write("上一页")
+		req.write("</a>")
+
+	for i in range(startPageIdx, endPageIdx + 1, 1):
+		if (cgival_pageIdx == i):
+			req.write("<button href='/market/query.psp?query=%s&amp;pageIdx=%d' class='yt-uix-pager-selected yt-uix-button' type='button'>&nbsp;" % (cgival_query, i))
+		else:
+			req.write("<button class=' yt-uix-button' href='/market/query.psp?query=%s&amp;pageIdx=%d' type='button' onclick=\";window.location.href=this.getAttribute('href');return false;\">" % (cgival_query, i))
+		req.write("<span class='yt-uix-button-content'>%d</span></button>&nbsp;" % i)
+
+	if (endPageIdx < totalPageIdx):
+		req.write("<a class='yt-uix-pager-link' href='/market/query.psp?query=%s&amp;pageIdx=%d'>" % (cgival_query, endPageIdx + 1))
+		req.write("下一页")
+		req.write("</a>")
+		req.write("...")
+		req.write("<button class=' yt-uix-button' href='/market/query.psp?query=%s&amp;pageIdx=%d' type='button' onclick=    \";window.location.href=this.getAttribute('href');return false;\">" % (cgival_query, totalPageIdx))
+		req.write("<span class='yt-uix-button-content'>%d</span></button>" % totalPageIdx)
+
+	if (_totalPageIdx > 80):
+		req.write("<br /><br />※  Android 电子市场最多提供800条搜索记录。")
+	req.write("</div>")
+%>
+
+<%
+else :
+%>
+
+<%
+%>
+
+<%@ include file="footer.psp" %>

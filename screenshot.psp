@@ -1,0 +1,32 @@
+<%
+import MySQLdb
+import cgi
+
+kandroid_market = apache.import_module("kandroid_market", path=['/home/deli/market'])
+market_pb2 = apache.import_module("market_pb2", path=['/home/deli/market'])
+
+cgival_appId = ""
+cgival_id = "0"
+cgival_thumbnail = 0
+
+if req.parsed_uri[apache.URI_QUERY]:
+	pairs = cgi.parse_qs(req.parsed_uri[apache.URI_QUERY])
+	for key, value in pairs.items():
+		if key == 'appId':
+			cgival_appId = value[0]
+		elif key == 'id':
+			cgival_id = value[0]
+		elif key == 'thumbnail':
+			cgival_thumbnail = 1
+
+if cgival_appId:
+	request = kandroid_market.Request(req)
+	request.screenshotRequest(cgival_appId,cgival_id,cgival_thumbnail)
+	data = request.executeHttpQuery()
+	if data:
+		response = market_pb2.Response()
+		response.ParseFromString(data)
+		for rGroup in response.responsegroup:
+			req.write(rGroup.imageResponse.imageData)
+%>
+

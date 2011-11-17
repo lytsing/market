@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="zh-cn" xml:lang="zh-cn">
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8' /> 
+<meta http-equiv="content-language" content="zh-cn" />
+<meta http-equiv='cache-control' content='no-cache' />
+<meta http-equiv='pragma' content='no-cache' />
+ 
+<link href="./css/common.css" rel="stylesheet" type="text/css" media="screen" />
+
+<script type="text/javascript">
+<!--
+function load() {
+	var obj = document.getElementById("divchild");
+	var imgObj = document.getElementById("img");
+	if (obj.style.display == "none") {
+		obj.style.display = "block";
+		imgObj.src="./image/folder2.gif";
+	} else {
+		obj.style.display = "none";
+		imgObj.src="./image/folder.gif";
+	}
+}
+//-->
+</script>
+
+<title>Android Market Web Client</title>
+</head>
+
+<body> 
+	<div class="container">
+		<div id="navigation">
+			<a href="#"> <span class="login">Login</span> </a>
+		</div>
+
+		<div class="header_wrapper">
+			<p>
+			<img src="./image/androidmarket.png" width="72" height="72" alt="android market" />
+				<span style="font-family:Arial;font-weight:normal;font-size:12px;color:#333333">寻找最好的 Android 手机应用软件</span>
+			</p>
+		</div>
+
+		<div id="tab-menu">
+			<ul id="tab-menu-item">
+				<li class="first">
+				<a href="./featuredAppItem.psp">精选推荐软件</a>
+				</li>
+				<li class="seperator"></li>
+				<li class="default">
+				<a href="./allAppItem.psp">应用程序</a>&nbsp;&nbsp;
+				</li>
+				<li class="seperator"></li>
+				<li class="default">
+				<a href="./allGameItem.psp">游戏</a>&nbsp;&nbsp;
+				</li>
+				<li class="seperator"></li>
+				<li class="default">
+				<a href="http://wallpapers.androlib.com/">壁纸</a>&nbsp;&nbsp;
+				</li>
+				<li class="seperator"></li>
+				<li class="default" style="float:right">
+				<a href="./faq.html">常见问答(Q&amp;A)</a>&nbsp;&nbsp;
+				</li>
+				<li class="seperator"></li>
+				<li class="default" style="float:right">
+				<a href="./android-market-api.html">Andriod Market API </a>&nbsp;&nbsp;
+				</li>
+			</ul>
+		</div>
+
+
+		<table style="margin-top:15px">
+			<tr>
+				<td valign="top">
+					<div id="sidebar">
+						<div id="menu-middle">
+							<div style="height:5px;line-height:0px;overflow:hidden"></div>
+							<div class="menu-link">
+								<img id="img" src="./image/folder2.gif" width="12" height="11" alt="" onclick="load();" />
+								<strong><a href='./allAppItem.psp'>所有应用程序</a></strong><br />
+								<div id="divchild" style="display:block">
+									<ul class="subcategory">
+										<li> <a href='./categoryItem.psp?categoryId=HEALTH'>健康</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=FINANCE'>财经</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=NEWS'>资讯和天气</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=TOOLS'>工具</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=LIFESTYLE'>生活方式</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=COMICS'>动漫</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=MULTIMEDIA'>多媒体</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=SOCIAL'>社交</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=SHOPPING'>购物</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=SPORTS'>体育</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=ENTERTAINMENT'>娱乐</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=TRAVEL'>旅行</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=REFERENCE'>参考</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=COMMUNICATION'>通讯</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=THEMES'>主题</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=PRODUCTIVITY'>效率</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=DEMO'>演示</a></li>
+										<li> <a href='./categoryItem.psp?categoryId=LIBRARIES'>软件库</a></li>
+									</ul>
+								</div>
+							</div>
+							<div style="height:5px;line-height:0px;overflow:hidden"></div>
+							<div class="menu-link">
+								<img src="./image/folder2.gif" width="12" height="11"  alt="" />
+								<strong><a href='./allGameItem.psp'>所有游戏</a></strong><br />
+								<ul class="subcategory">
+									<li> <a href='./categoryItem.psp?categoryId=CASUAL'>休闲游戏</a></li>
+									<li> <a href='./categoryItem.psp?categoryId=ARCADE'>游戏</a></li>
+									<li> <a href='./categoryItem.psp?categoryId=BRAIN'>益智类游戏</a></li>
+									<li> <a href='./categoryItem.psp?categoryId=CARDS'>纸牌游戏</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</td>
+
+				<td valign="top" align="left" style="width:760px; border:1px solid #D3E1F9">
+					<div id="content">
+						<div id="search-box">
+							<form action="/market/query.psp" method="get">
+								<div>
+									<table style="display: inline;"><tbody><tr>
+												<td valign="middle">
+													<input type="text" style="width: 290px; height:24px;" maxlength="128" id="searchInput" name="query" class="textinput" onfocus="this.className='textinput input_focus';if (this.value == '搜索 Android 电子市场') {this.value = '';}" onblur="this.className='textinput'; if (this.value == '') {this.value = '搜索 Android 电子市场';}" value="搜索 Android 电子市场" tabindex="1" /></td>
+												<td valign="middle">
+													<button onclick="if ($('query').value != '') { $('search').submit();};return false;" class="sexy-button sexy-button-primary" tabindex="2">
+														<span>搜索</span></button>
+									</td></tr></tbody></table>
+								</div>
+							</form>
+						</div>
+
+

@@ -1,0 +1,55 @@
+<%@ include file="header.psp" %>
+
+<%
+import MySQLdb
+import cgi
+
+kandroid_market = apache.import_module("kandroid_market", path=['/home/deli/market'])
+market_pb2 = apache.import_module("market_pb2", path=['/home/deli/market'])
+
+cgival_pageIdx = 1
+
+if req.parsed_uri[apache.URI_QUERY]:
+	pairs = cgi.parse_qs(req.parsed_uri[apache.URI_QUERY])
+	for key, value in pairs.items():
+		if key == 'pageIdx':
+			cgival_pageIdx = int(value[0])
+
+%>
+
+<%
+request = kandroid_market.Request(req)
+request.featuredAppRequest(1)
+data = request.executeHttpQuery()
+response = market_pb2.Response()
+response.ParseFromString(data)
+
+for rGroup in response.responsegroup:
+	for rApp in rGroup.appsResponse.app:
+%>
+	<table class="assetItem"><tr>
+	<td class="icon">
+<%
+		req.write("<img width='48' src='/market/icon.psp?appId=%s' alt='' />" % (rApp.id))
+%>
+	</td>
+	<td class="title">
+	<strong><a href="/market/asset.psp?appId=<%=rApp.id%>"><%=rApp.title.encode("utf-8")%></a></strong><br />
+	<%=rApp.creator.encode("utf-8")%>
+	</td>
+	<td class="price">
+<%
+		if rApp.price:
+			req.write(rApp.price.encode("utf-8"))
+		else:
+			req.write("免费")
+		req.write("<br /><img src='/market/image/star_%s.png' alt='' />" % rApp.rating[0:3]);
+%>
+	</td>
+	</tr>
+	<tr><td style="height:1px;" colspan="3" class="list_hr_line"></td></tr>
+	</table>
+<%
+%>
+
+<%@ include file="footer.psp" %>

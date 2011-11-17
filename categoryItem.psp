@@ -1,0 +1,126 @@
+<%@ include file="header.psp" %>
+
+<%
+import MySQLdb
+import cgi
+
+kandroid_market = apache.import_module("kandroid_market", path=['/home/deli/market'])
+market_pb2 = apache.import_module("market_pb2", path=['/home/deli/market'])
+
+cgival_categoryId = ""
+cgival_pageIdx = 1
+cgival_orderType = "POPULAR"
+cgival_viewType = "PAID"
+
+if req.parsed_uri[apache.URI_QUERY]:
+	pairs = cgi.parse_qs(req.parsed_uri[apache.URI_QUERY])
+	for key, value in pairs.items():
+		if key == 'categoryId':
+			cgival_categoryId = value[0]
+		elif key == 'pageIdx':
+			cgival_pageIdx = int(value[0])
+		elif key == 'orderType':
+			cgival_orderType = value[0]
+		elif key == 'viewType':
+			cgival_viewType = value[0]
+
+%>
+
+<p style="color: #000000; padding: 0pt; font-weight: bold; margin-bottom: 10px; margin-top: 0px; clear: both; height: 20px;">分类查看：</p>
+
+<%
+
+if cgival_pageIdx < 1:
+	cgival_pageIdx = 1
+
+if cgival_orderType == "NEWEST":
+	cgival_viewType = ""
+
+req.write("<ul class='tabs'>")
+
+if cgival_orderType == "POPULAR" and cgival_viewType == "PAID":
+	req.write("<li class='on'><a href='/market/categoryItem.psp?categoryId=%s&amp;orderType=POPULAR&amp;viewType=PAID'>热门付费应用</a></li>" % cgival_categoryId)
+	req.write("<li class=''><a href='/market/categoryItem.psp?categoryId=%s&amp;orderType=POPULAR&amp;viewType=FREE'>热门免费应用</a></li>" % cgival_categoryId)
+	req.write("<li class=''><a href='/market/categoryItem.psp?categoryId=%s&amp;orderType=NEWEST'>新应用</a></li>" % cgival_categoryId)
+elif cgival_orderType == "POPULAR" and cgival_viewType == "FREE":
+	req.write("<li class=''><a href='/market/categoryItem.psp?categoryId=%s&amp;orderType=POPULAR&amp;viewType=PAID'>热门付费应用</a></li>" % cgival_categoryId)
+	req.write("<li class='on'><a href='/market/categoryItem.psp?categoryId=%s&amp;orderType=POPULAR&amp;viewType=FREE'>热门免费应用</a></li>" % cgival_categoryId)
+	req.write("<li class=''><a href='/market/categoryItem.psp?categoryId=%s&amp;orderType=NEWEST'>新应用</a></li>" % cgival_categoryId)
+elif cgival_orderType == "NEWEST":
+	req.write("<li class=''><a href='/market/categoryItem.psp?categoryId=%s&amp;orderType=POPULAR&amp;viewType=PAID'>热门付费应用</a></li>" % cgival_categoryId)
+	req.write("<li class=''><a href='/market/categoryItem.psp?categoryId=%s&amp;orderType=POPULAR&amp;viewType=FREE'>热门免费应用</a></li>" % cgival_categoryId)
+	req.write("<li class='on'><a href='/market/categoryItem.psp?categoryId=%s&amp;orderType=NEWEST'>新应用</a></li>" % cgival_categoryId)
+req.write("</ul><br /><br />")
+%>
+
+<div class="resultList">
+
+<%
+request = kandroid_market.Request(req)
+request.categoryAppRequest(cgival_categoryId, cgival_pageIdx, cgival_orderType, cgival_viewType)
+data = request.executeHttpQuery()
+response = market_pb2.Response()
+response.ParseFromString(data)
+
+assetItemCount = 0
+
+for rGroup in response.responsegroup:
+	for rApp in rGroup.appsResponse.app:
+		assetItemCount = assetItemCount + 1
+%>
+<span>
+	<a class="result" title='<%=rApp.title.encode("utf-8")%>' style="text-decoration: none;" href="/market/asset.psp?appId=<%=rApp.id%>">
+	<span>
+		<span class="priceBox">
+<%
+		if rApp.price:
+			req.write("<span class='pricePaid'>")
+			req.write(rApp.price.encode("utf-8"))
+		else:
+			req.write("<span class='priceFree'>")
+			req.write("免费")
+
+		req.write("</span><br /><span class='bgrating'> <span class='rating'>")
+		req.write("<img src='/market/image/star_%s.png' alt='' /></span></span></span>" % rApp.rating[0:3]);
+
+		req.write("<img class='icon' width='48' src='/market/icon.psp?appId=%s' alt='' onerror=\"javascript:this.src='./image/ic_vm_thumbnail_big.png'\" />" % (rApp.id))
+%>
+	<span class="appSnippet">
+	<span class="appTitle">
+	<%=rApp.title.encode("utf-8")%>
+	</span>
+	<span class="dev">
+	<%=rApp.creator.encode("utf-8")%>
+	</span>
+	</span>
+
+	<span class="clear"></span>
+	</span>
+	</a>
+	</span>
+
+<%
+req.write("</div>")
+req.write("<div class='clear'></div>")
+
+req.write("<div class='yt-uix-pager'>")
+
+if cgival_pageIdx > 1:
+	req.write("<a class='yt-uix-pager-link' href='/market/categoryItem.psp?categoryId=%s&amp;orderType=%s&amp;viewType=%s&amp;pageIdx=%d' >" % (cgival_categoryId, cgival_orderType, cgival_viewType, cgival_pageIdx - 1))
+	req.write("上一页")
+	req.write("</a>")
+
+req.write("<button class='yt-uix-button' type='button'><span class='yt-uix-button-content'>%d</span></button>" % cgival_pageIdx)
+
+if assetItemCount == 10:
+	req.write("<a class='yt-uix-pager-link' href='/market/categoryItem.psp?categoryId=%s&amp;orderType=%s&amp;viewType=%s&amp;pageIdx=%d' >" % (cgival_categoryId, cgival_orderType, cgival_viewType, cgival_pageIdx + 1))
+	req.write("下一页")
+	req.write("</a>")
+
+req.write("</div>")
+%>
+
+<%
+%>
+
+<%@ include file="footer.psp" %>

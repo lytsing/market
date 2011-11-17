@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="zh-cn" xml:lang="zh-cn">
+<head>
+
+<%
+import MySQLdb
+import cgi
+
+kandroid_market = apache.import_module("kandroid_market", path=['/home/deli/market'])
+market_pb2 = apache.import_module("market_pb2", path=['/home/deli/market'])
+
+cgival_categoryId = "1"
+
+if req.parsed_uri[apache.URI_QUERY]:
+	pairs = cgi.parse_qs(req.parsed_uri[apache.URI_QUERY])
+	for key, value in pairs.items():
+		if key == 'categoryId':
+			cgival_categoryId = value[0]
+
+%>
+
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+<title>应用程序</title>
+</head>
+
+<body>
+
+<div>
+
+<%
+request = kandroid_market.Request(req)
+request.categoryRequest(int(cgival_categoryId))
+data = request.executeHttpQuery()
+response = market_pb2.Response()
+response.ParseFromString(data)
+
+for rGroup in response.responsegroup:
+	for  rCategoryGroup in rGroup.subCategoriesResponse.categorygroup:
+		req.write("<a href='/market/categoryItem.psp?categoryId=%s'>%s</a><br />" % (rCategoryGroup.id.encode("utf-8"), rCategoryGroup.display.encode("utf-8")))
+%>
+
+</div>
+
+</body>
+</html>
+
