@@ -76,7 +76,7 @@ class Request(object):
    self.request = request
 
  def executeHttpQuery(self):
-   requestData = base64.encodestring(self.request.SerializeToString())
+   requestData =  base64.urlsafe_b64encode(self.request.SerializeToString())
 
    market_headers = {
       "Cookie": "ANDROID=" + self.authToken,
